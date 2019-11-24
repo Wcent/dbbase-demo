@@ -4,6 +4,7 @@ import org.cent.dbbasedemo.mapper.slave.OrderMapper;
 import org.cent.dbbasedemo.model.Order;
 import org.cent.dbbasedemo.service.CounterService;
 import org.cent.dbbasedemo.service.OrderService;
+import org.cent.dbbasedemo.util.RedisCounterUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -18,6 +19,9 @@ import java.time.format.DateTimeFormatter;
  */
 @Repository
 public class OrderServiceImpl implements OrderService {
+
+    @Autowired
+    private RedisCounterUtil redisCounterUtil;
 
     @Autowired
     private CounterService counterService;
@@ -44,7 +48,8 @@ public class OrderServiceImpl implements OrderService {
 
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HHmmss"));
-        String oid = counterService.getId("order_id");
+        String oid = redisCounterUtil.getId("order_id");
+//        String oid = counterService.getId("order_id");
         Order order = new Order();
         order.setOid(oid);
         order.setAmount(amount);

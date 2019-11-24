@@ -3,6 +3,7 @@ package org.cent.dbbasedemo.controller;
 import org.cent.dbbasedemo.model.Order;
 import org.cent.dbbasedemo.service.CounterService;
 import org.cent.dbbasedemo.service.OrderService;
+import org.cent.dbbasedemo.util.RedisCounterUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,10 +20,18 @@ import java.math.BigDecimal;
 public class TestController {
 
     @Autowired
+    private RedisCounterUtil redisCounterUtil;
+
+    @Autowired
     private CounterService counterService;
 
     @Autowired
     private OrderService orderService;
+
+    @GetMapping("/sid/{name}")
+    String getSequenceId(@PathVariable(name = "name") String name) {
+        return redisCounterUtil.getId(name);
+    }
 
     @GetMapping("/oid/{name}")
     String getOrderId(@PathVariable(name = "name") String name) {

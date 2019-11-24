@@ -1,4 +1,9 @@
 spring:
+  redis:
+    host: localhost
+    port: 6379
+    password:
+
   datasource:
     # 主数据源配置
     master:
