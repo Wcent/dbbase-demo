@@ -8,5 +8,5 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public interface CounterService {
-    String getId();
+    String getId(String name);
 }

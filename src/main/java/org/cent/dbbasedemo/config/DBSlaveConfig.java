@@ -5,9 +5,9 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
+import org.mybatis.spring.annotation.MapperScans;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -17,46 +17,42 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import javax.sql.DataSource;
 
 /**
- * 主数据源配置
+ * 从数据源配置
  * @author Vincent
- * @version 1.0 2019/11/23
+ * @version 1.0 2019/11/24
  */
 @Configuration
 // 多套数据源，要指定mapper接口使用数据源
-@MapperScan(basePackages = "org.cent.dbbasedemo.mapper.master", sqlSessionTemplateRef = "masterSqlSessionTemplate")
-public class DBMasterConfig {
+@MapperScan(basePackages = "org.cent.dbbasedemo.mapper.slave", sqlSessionTemplateRef = "slaveSqlSessionTemplate")
+public class DBSlaveConfig {
 
-    @Primary
-    @Bean(name = "masterDataSource")
-    @ConfigurationProperties(prefix = "spring.datasource.master")
+    @Bean(name = "slaveDataSource")
+    @ConfigurationProperties(prefix = "spring.datasource.slave")
     public DataSource dataSource() {
 //        return DataSourceBuilder.create().build();
         return new DruidDataSource();
     }
 
-    @Primary
-    @Bean(name = "masterTransactionManager")
+    @Bean(name = "slaveTransactionManager")
     public DataSourceTransactionManager transactionManager(
-            @Qualifier("masterDataSource") DataSource dataSource) {
+            @Qualifier("slaveDataSource") DataSource dataSource) {
         return new DataSourceTransactionManager(dataSource);
     }
 
-    @Primary
-    @Bean(name = "masterSqlSessionFactory")
+    @Bean(name = "slaveSqlSessionFactory")
     public SqlSessionFactory sqlSessionFactory(
-            @Qualifier("masterDataSource") DataSource dataSource) throws Exception {
+            @Qualifier("slaveDataSource") DataSource dataSource) throws Exception {
         SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
         factoryBean.setDataSource(dataSource);
         factoryBean.setMapperLocations(
                 new PathMatchingResourcePatternResolver()
-                        .getResources("classpath:mapper/master/*.xml"));
+                        .getResources("classpath:mapper/slave/*.xml"));
         return factoryBean.getObject();
     }
 
-    @Primary
-    @Bean(name = "masterSqlSessionTemplate")
+    @Bean(name = "slaveSqlSessionTemplate")
     public SqlSessionTemplate sqlSessionTemplate(
-            @Qualifier("masterSqlSessionFactory") SqlSessionFactory sqlSessionFactory) {
+            @Qualifier("slaveSqlSessionFactory") SqlSessionFactory sqlSessionFactory) {
         return new SqlSessionTemplate(sqlSessionFactory);
     }
 }

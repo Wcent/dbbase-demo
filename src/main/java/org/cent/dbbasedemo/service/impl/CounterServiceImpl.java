@@ -1,12 +1,11 @@
 package org.cent.dbbasedemo.service.impl;
 
-import org.cent.dbbasedemo.mapper.CounterMapper;
+import org.cent.dbbasedemo.mapper.master.CounterMapper;
 import org.cent.dbbasedemo.model.Counter;
 import org.cent.dbbasedemo.service.CounterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -21,17 +20,18 @@ public class CounterServiceImpl implements CounterService {
     private CounterMapper counterMapper;
 
     /**
-     * 计数器生成订单号
+     * 计数器生成24位id号
      * 日期+时间+计数值，计数值每日累计，切日重置
-     * @return
+     * @param name 计数器名称
+     * @return 24位长的id号
      */
     @Override
-    public String getId() {
+    public String getId(String name) {
         String id = null;
         LocalDateTime now;
         String date;
         String time;
-        int rows = 0;
+        int rows;
 
         for (int i = 0; i < 10; i++) {
             // 当前日期、时间
@@ -40,9 +40,9 @@ public class CounterServiceImpl implements CounterService {
             time = now.toLocalTime().format(DateTimeFormatter.ofPattern("HHmmss"));
 
             // 当前计数值
-            Counter counter = counterMapper.getCounter("order_id");
+            Counter counter = counterMapper.getCounter(name);
             if (counter == null) {
-                throw new RuntimeException("Counter named 'order_id' not exist!");
+                throw new RuntimeException(String.format("Counter named '%s' not exist!", name));
             }
 
             // 同日累计，切日重置
