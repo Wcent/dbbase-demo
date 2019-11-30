@@ -32,7 +32,9 @@ public class RedisCounterUtil {
         // 新key-value，设置1天有效期，过去自动清理
         if (id <= 1) {
             stringRedisTemplate.expire(key, 1, TimeUnit.DAYS);
-            id = stringRedisTemplate.opsForValue().increment(key);
+            if (id == 0) {
+                id = stringRedisTemplate.opsForValue().increment(key);
+            }
         }
         // 日期+时间+计数值组成，计数值10位长，不足补前导0
         return date + time +String.format("%010d", id);
